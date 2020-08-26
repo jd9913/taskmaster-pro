@@ -3,6 +3,7 @@ var tasks = {};
 var createTask = function (taskText, taskDate, taskList) {
     // create elements that make up a task item
     var taskLi = $("<li>").addClass("list-group-item");
+
     var taskSpan = $("<span>")
         .addClass("badge badge-primary badge-pill")
         .text(taskDate);
@@ -13,6 +14,8 @@ var createTask = function (taskText, taskDate, taskList) {
     // append span and p element to parent li
     taskLi.append(taskSpan, taskP);
 
+    //check due date
+    auditTask(taskLi);
 
     // append to ul list on the page
     $("#list-" + taskList).append(taskLi);
@@ -51,11 +54,14 @@ var auditTask = function (taskEl) {
         .find("span")
         .text()
         .trim();
+    //ensure it worked
     console.log(date);
 
     //convert to moment object at 5:00pm
 
     var time = moment(date, "L").set("hour", 17);
+
+    //this should print out an object for the value of the date variable, but at 1700 hrs of that date
 
     console.log(time);
 
@@ -65,6 +71,9 @@ var auditTask = function (taskEl) {
     //apply new class if task is near/over due date
 
     if (moment().isAfter(time)) {
+        $(taskEl).addClass("list-group-item-danger");
+    }
+    else if (Math.abs(moment().diff(time, "days")) <= 2) {
         $(taskEl).addClass("list-group-item-warning");
     }
 
@@ -293,6 +302,9 @@ $(".list-group").on("change", "input[type='text']", function () {
         .addClass("badge badge-primary badge-pill")
         .text(date);
     $(this).replaceWith(taskSpan);
+
+    //Pass task's <li> element into auditTask() to check new due date
+    auditTask($(taskSpan).closest(".list-group-item"));
 
 });
 
